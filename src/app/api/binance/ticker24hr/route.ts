@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import type { Ticker24hr } from "@/lib/binance";
+import { BINANCE_REST_BASE, type Ticker24hr } from "@/lib/binance";
 
-const BINANCE_URL = "https://api.binance.com/api/v3/ticker/24hr";
+const BINANCE_URL = `${BINANCE_REST_BASE}/api/v3/ticker/24hr`;
 
 // Proxies Binance's public 24hr ticker so the browser never talks to
 // Binance directly (avoids CORS and keeps API usage server-side, where

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { BINANCE_REST_BASE } from "@/lib/binance";
 
-const BINANCE_URL = "https://api.binance.com/api/v3/klines";
+const BINANCE_URL = `${BINANCE_REST_BASE}/api/v3/klines`;
 
 // Seeds the sparkline with recent closes; live ticks from the WebSocket
 // hook are appended client-side after this initial load.

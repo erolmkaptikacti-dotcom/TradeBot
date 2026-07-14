@@ -1,4 +1,13 @@
 // Shared Binance constants, types, and formatting helpers.
+//
+// binance.com's public API/WebSocket returns HTTP 451 (geo-blocked) for
+// requests from the US and a few other restricted regions — which is what
+// both Vercel's default US region and a US-based browser hit. Binance.US
+// is a separate, purpose-built endpoint for US users that mirrors the same
+// API shape and isn't geo-blocked, so we point there instead. If you're
+// deploying somewhere binance.com isn't blocked, swap these back.
+export const BINANCE_REST_BASE = "https://api.binance.us";
+export const BINANCE_WS_BASE = "wss://stream.binance.us:9443/stream?streams=";
 
 export const WATCHLIST = [
   "BTCUSDT",

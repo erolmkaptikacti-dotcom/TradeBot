@@ -8,9 +8,13 @@ trading bot.
 ## Stack
 
 - Next.js (App Router) + TypeScript + Tailwind CSS
-- [Binance](https://binance-docs.github.io/apidocs/spot/en/) public REST API
-  (proxied through Next.js route handlers) and WebSocket miniTicker stream
-  for real, live, keyless market data
+- [Binance.US](https://docs.binance.us/) public REST API (proxied through
+  Next.js route handlers) and WebSocket miniTicker stream for real, live,
+  keyless market data. Base URLs live in `src/lib/binance.ts`
+  (`BINANCE_REST_BASE` / `BINANCE_WS_BASE`) — global `binance.com` returns
+  HTTP 451 for US-based requests (Vercel's default region, and most US
+  browsers), so this points at Binance.US instead. If you're deploying
+  somewhere binance.com isn't geo-blocked, swap those two constants back.
 - Zustand (+ `persist`) for the local paper-trading engine
 
 ## How it's structured
@@ -38,7 +42,8 @@ that data sits behind exchange partner programs. As a real, live stand-in,
 the leaderboard shows the actual top 24h gainers/losers across all Binance
 USDT pairs (`src/app/api/binance/leaderboard/route.ts`). This is a natural
 place to swap in a specific trader-leaderboard API later if you get access
-to one.
+to one. Binance.US lists far fewer, lower-volume pairs than global Binance,
+so the leaderboard's minimum-volume floor is set much lower to match.
 
 ## Getting started
 

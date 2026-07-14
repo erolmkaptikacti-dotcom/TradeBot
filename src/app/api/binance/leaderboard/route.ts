@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
-import { toLeaderboardEntry, type Ticker24hr } from "@/lib/binance";
+import { BINANCE_REST_BASE, toLeaderboardEntry, type Ticker24hr } from "@/lib/binance";
 
-const BINANCE_URL = "https://api.binance.com/api/v3/ticker/24hr";
+const BINANCE_URL = `${BINANCE_REST_BASE}/api/v3/ticker/24hr`;
 
 // Real 24h "top gainers / top losers" leaderboard, derived from Binance's
 // full public ticker feed. This stands in for a "most profitable traders"
 // leaderboard, which no exchange exposes without partner API access — this
 // is the closest live, keyless equivalent: real coins, real 24h PnL.
-const MIN_QUOTE_VOLUME_USDT = 5_000_000;
+// Binance.US lists far fewer pairs with far lower volume than global
+// Binance, so the floor here is much lower than it would be on binance.com.
+const MIN_QUOTE_VOLUME_USDT = 100_000;
 const TOP_N = 10;
 
 export async function GET() {

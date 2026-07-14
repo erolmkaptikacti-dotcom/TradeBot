@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BINANCE_WS_BASE } from "@/lib/binance";
 
 export interface LiveTick {
   symbol: string;
@@ -26,7 +27,7 @@ interface CombinedStreamMessage {
   data: MiniTickerPayload;
 }
 
-const STREAM_BASE = "wss://stream.binance.com:9443/stream?streams=";
+const STREAM_BASE = BINANCE_WS_BASE;
 const RECONNECT_BASE_DELAY_MS = 1000;
 const RECONNECT_MAX_DELAY_MS = 30000;
 

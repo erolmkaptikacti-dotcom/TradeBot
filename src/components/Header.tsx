@@ -5,7 +5,7 @@ export function Header() {
         <span className="text-base font-semibold tracking-tight text-text-primary">
           TradeBot
         </span>
-        <span className="text-xs text-text-muted">Crypto Dashboard</span>
+        <span className="text-xs text-text-muted">Trading Dashboard</span>
       </div>
       <div className="flex items-center gap-2 rounded-full border border-border-hairline bg-surface-2 px-3 py-1 text-[11px] text-text-muted">
         <span className="h-1.5 w-1.5 rounded-full bg-status-warning" aria-hidden />

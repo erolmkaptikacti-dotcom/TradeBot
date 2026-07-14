@@ -10,7 +10,7 @@ const BINANCE_URL = `${BINANCE_REST_BASE}/api/v3/ticker/24hr`;
 // Binance.US lists far fewer pairs with far lower volume than global
 // Binance, so the floor here is much lower than it would be on binance.com.
 const MIN_QUOTE_VOLUME_USDT = 100_000;
-const TOP_N = 10;
+const TOP_N = 20;
 
 export async function GET() {
   try {

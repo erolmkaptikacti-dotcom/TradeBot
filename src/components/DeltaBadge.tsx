@@ -1,4 +1,4 @@
-import { formatPercent } from "@/lib/binance";
+import { formatPercent } from "@/lib/format";
 
 export function DeltaBadge({ value }: { value: number }) {
   const isUp = value > 0;

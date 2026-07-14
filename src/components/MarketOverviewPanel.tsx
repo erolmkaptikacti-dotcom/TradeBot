@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useBinanceTicker } from "@/hooks/useBinanceTicker";
-import { WATCHLIST, coinLabel, formatUsd } from "@/lib/binance";
+import { WATCHLIST, coinLabel } from "@/lib/binance";
+import { formatUsd } from "@/lib/format";
 import { DeltaBadge } from "./DeltaBadge";
 import { PriceSparkline } from "./PriceSparkline";
 

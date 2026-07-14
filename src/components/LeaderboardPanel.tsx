@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { usePolledFetch } from "@/hooks/usePolledFetch";
-import { formatUsd, type LeaderboardEntry } from "@/lib/binance";
+import type { LeaderboardEntry } from "@/lib/binance";
+import { formatUsd } from "@/lib/format";
 import { DeltaBadge } from "./DeltaBadge";
+
+const SIDEBAR_LIMIT = 10;
 
 interface LeaderboardResponse {
   gainers: LeaderboardEntry[];
@@ -24,7 +28,7 @@ export function LeaderboardPanel({
     15_000
   );
 
-  const entries = data?.[tab] ?? [];
+  const entries = (data?.[tab] ?? []).slice(0, SIDEBAR_LIMIT);
 
   return (
     <section className="flex flex-col gap-3 lg:h-full lg:min-h-0">
@@ -78,6 +82,13 @@ export function LeaderboardPanel({
           </li>
         ))}
       </ol>
+
+      <Link
+        href="/top-traders"
+        className="text-[11px] font-medium text-text-secondary hover:text-text-primary"
+      >
+        See full leaderboard →
+      </Link>
     </section>
   );
 }

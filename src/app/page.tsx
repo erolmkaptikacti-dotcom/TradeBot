@@ -1,32 +1,41 @@
 "use client";
 
-import { useState } from "react";
-import { Header } from "@/components/Header";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { LeaderboardPanel } from "@/components/LeaderboardPanel";
 import { MarketOverviewPanel } from "@/components/MarketOverviewPanel";
 import { TradePanel } from "@/components/TradePanel";
 import { WATCHLIST } from "@/lib/binance";
 
-export default function DashboardPage() {
-  const [selectedSymbol, setSelectedSymbol] = useState<string>(WATCHLIST[0]);
+function CryptoDashboard() {
+  const searchParams = useSearchParams();
+  const deepLinkedSymbol = searchParams.get("symbol");
+  const [selectedSymbol, setSelectedSymbol] = useState<string>(
+    deepLinkedSymbol || WATCHLIST[0]
+  );
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface-0 lg:h-screen">
-      <Header />
-      <main className="grid grid-cols-1 gap-px bg-border-hairline lg:min-h-0 lg:flex-1 lg:grid-cols-[280px_1fr_340px] lg:overflow-hidden">
-        <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
-          <LeaderboardPanel onSelectSymbol={setSelectedSymbol} />
-        </div>
-        <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
-          <MarketOverviewPanel
-            selectedSymbol={selectedSymbol}
-            onSelectSymbol={setSelectedSymbol}
-          />
-        </div>
-        <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
-          <TradePanel selectedSymbol={selectedSymbol} />
-        </div>
-      </main>
-    </div>
+    <main className="grid h-full grid-cols-1 gap-px bg-border-hairline lg:grid-cols-[280px_1fr_340px] lg:overflow-hidden">
+      <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
+        <LeaderboardPanel onSelectSymbol={setSelectedSymbol} />
+      </div>
+      <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
+        <MarketOverviewPanel
+          selectedSymbol={selectedSymbol}
+          onSelectSymbol={setSelectedSymbol}
+        />
+      </div>
+      <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
+        <TradePanel selectedSymbol={selectedSymbol} />
+      </div>
+    </main>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <CryptoDashboard />
+    </Suspense>
   );
 }

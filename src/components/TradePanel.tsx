@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useBinanceTicker } from "@/hooks/useBinanceTicker";
-import { coinLabel, formatUsd } from "@/lib/binance";
+import { coinLabel } from "@/lib/binance";
+import { formatUsd } from "@/lib/format";
 import { usePaperTradingStore, type OrderSide } from "@/store/paperTradingStore";
 import { DeltaBadge } from "./DeltaBadge";
 

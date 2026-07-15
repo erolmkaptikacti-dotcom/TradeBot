@@ -127,10 +127,17 @@ none of the US-geoblock/legal exposure that real Polymarket trading carries.
 - Copying flows through a single `copyPositions()` seam — the point where a
   real Polymarket order would later plug in, if you ever chose to go live.
 
-Both Polymarket routes are best-effort against undocumented public
-endpoints (the leaderboard URL is overridable via `POLYMARKET_LEADERBOARD_URL`)
-and fall back to seeded demo data tagged `demo: true` when unreachable, so
-the whole copy → portfolio flow works and is demonstrable regardless.
+Reading Polymarket data is **public and not geoblocked** — the US
+restriction only applies to *placing real trades*, which this app never
+does. The positions endpoint (`data-api.polymarket.com/positions`) is
+documented and needs no auth. The trader leaderboard's host/path is
+undocumented and has moved over time, so the leaders route tries the known
+public hosts (`lb-api` then `data-api`) in order, overridable via
+`POLYMARKET_LEADERBOARD_URL`. When live data is served the UI shows a green
+**LIVE** badge; when every endpoint fails it falls back to seeded demo data
+(**DEMO DATA** badge) and surfaces the exact reason (which host returned
+what) right in the panel, so a still-failing leaderboard on a deployed site
+is diagnosable at a glance rather than silently masked.
 
 Note on **Kalshi**: it was considered as another copy source but can't
 serve this feature — its order book is anonymous, with no public

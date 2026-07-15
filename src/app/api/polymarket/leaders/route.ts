@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import {
-  POLYMARKET_LEADERBOARD_API,
+  leaderboardCandidates,
   type LeaderboardWindow,
   type PolymarketTrader,
 } from "@/lib/polymarket";
@@ -11,13 +11,14 @@ interface RawLeader {
   wallet?: string;
   address?: string;
   user?: string;
+  userName?: string;
   name?: string;
   pseudonym?: string;
-  profit?: number;
   pnl?: number;
+  profit?: number;
   amount?: number;
-  volume?: number;
   vol?: number;
+  volume?: number;
 }
 
 function num(...candidates: (number | undefined)[]): number {
@@ -27,44 +28,78 @@ function num(...candidates: (number | undefined)[]): number {
   return 0;
 }
 
-// Attempts Polymarket's public profit leaderboard, normalizing several
-// plausible field names; on any failure returns clearly-tagged demo data.
+function mapLeader(r: RawLeader): PolymarketTrader {
+  return {
+    address: r.proxyWallet ?? r.wallet ?? r.address ?? r.user ?? "",
+    name: r.userName ?? r.name ?? r.pseudonym ?? null,
+    pnl: num(r.pnl, r.profit, r.amount),
+    volume: num(r.volume, r.vol),
+  };
+}
+
+// Extracts leader rows from the several response shapes Polymarket's
+// leaderboard hosts have used: a bare array, {data|leaderboard: [...]}, or
+// separate {profit: [...], volume: [...]} arrays (in which case we take
+// profit and enrich volume by wallet).
+function extractLeaders(body: unknown): PolymarketTrader[] {
+  if (Array.isArray(body)) return body.map(mapLeader).filter((t) => t.address);
+
+  const obj = body as Record<string, unknown> | null;
+  if (!obj) return [];
+
+  const profit = obj.profit ?? obj.pnl;
+  const volume = obj.volume ?? obj.vol;
+  if (Array.isArray(profit)) {
+    const leaders = (profit as RawLeader[]).map(mapLeader).filter((t) => t.address);
+    if (Array.isArray(volume)) {
+      const volByWallet = new Map<string, number>();
+      for (const v of volume as RawLeader[]) {
+        const t = mapLeader(v);
+        if (t.address) volByWallet.set(t.address, num(v.volume, v.vol, v.amount));
+      }
+      for (const l of leaders) {
+        if (l.volume === 0 && volByWallet.has(l.address)) l.volume = volByWallet.get(l.address)!;
+      }
+    }
+    return leaders;
+  }
+
+  const rows = obj.data ?? obj.leaderboard ?? obj.results;
+  if (Array.isArray(rows)) return (rows as RawLeader[]).map(mapLeader).filter((t) => t.address);
+  return [];
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const window = (searchParams.get("window") ?? "7d") as LeaderboardWindow;
 
-  try {
-    const url = new URL(POLYMARKET_LEADERBOARD_API);
-    url.searchParams.set("window", window);
-    url.searchParams.set("type", "pnl");
-    url.searchParams.set("limit", "10");
-
-    const res = await fetch(url, {
-      headers: { accept: "application/json" },
-      next: { revalidate: 30 },
-    });
-    if (!res.ok) throw new Error(`Polymarket responded with ${res.status}`);
-
-    const body = await res.json();
-    const rows: RawLeader[] = Array.isArray(body) ? body : body?.data ?? body?.leaderboard ?? [];
-    const leaders: PolymarketTrader[] = rows
-      .map((r) => ({
-        address: r.proxyWallet ?? r.wallet ?? r.address ?? r.user ?? "",
-        name: r.name ?? r.pseudonym ?? null,
-        pnl: num(r.profit, r.pnl, r.amount),
-        volume: num(r.volume, r.vol),
-      }))
-      .filter((t) => t.address.length > 0);
-
-    if (leaders.length === 0) throw new Error("No leaders returned");
-
-    return NextResponse.json({ leaders, window, demo: false, updatedAt: Date.now() });
-  } catch {
-    return NextResponse.json({
-      leaders: generateDemoLeaders(window),
-      window,
-      demo: true,
-      updatedAt: Date.now(),
-    });
+  const attempts: string[] = [];
+  for (const url of leaderboardCandidates(window, 10)) {
+    try {
+      const res = await fetch(url, {
+        headers: { accept: "application/json" },
+        next: { revalidate: 30 },
+      });
+      if (!res.ok) {
+        attempts.push(`${new URL(url).host} → ${res.status}`);
+        continue;
+      }
+      const leaders = extractLeaders(await res.json()).slice(0, 10);
+      if (leaders.length === 0) {
+        attempts.push(`${new URL(url).host} → 0 rows`);
+        continue;
+      }
+      return NextResponse.json({ leaders, window, demo: false, updatedAt: Date.now() });
+    } catch (err) {
+      attempts.push(`${new URL(url).host} → ${err instanceof Error ? err.message : "error"}`);
+    }
   }
+
+  return NextResponse.json({
+    leaders: generateDemoLeaders(window),
+    window,
+    demo: true,
+    reason: attempts.length ? `Live leaderboard unavailable (${attempts.join("; ")})` : "No endpoint configured",
+    updatedAt: Date.now(),
+  });
 }

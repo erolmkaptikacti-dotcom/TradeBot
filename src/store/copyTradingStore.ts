@@ -29,11 +29,17 @@ export interface CopyResult {
   error?: string;
 }
 
+export interface FollowedTrader {
+  address: string;
+  name: string | null;
+  demo: boolean; // whether this trader came from demo data (fake wallet)
+}
+
 interface CopyTradingState {
   startingBalance: number;
   balance: number;
   positions: CopiedPosition[];
-  followed: string[]; // trader addresses being auto-mirrored
+  followed: FollowedTrader[]; // traders being auto-mirrored
   /**
    * Mirrors a trader's positions into the paper wallet, allocating `budget`
    * across them proportionally to the trader's own exposure. Positions
@@ -48,7 +54,7 @@ interface CopyTradingState {
     budget: number
   ) => CopyResult;
   updatePrices: (prices: Record<string, number>) => void; // keyed by position id
-  toggleFollow: (address: string) => void;
+  toggleFollow: (trader: FollowedTrader) => void;
   isFollowing: (address: string) => boolean;
   removePosition: (id: string) => void;
   reset: () => void;
@@ -132,14 +138,14 @@ export const useCopyTradingStore = create<CopyTradingState>()(
           ),
         })),
 
-      toggleFollow: (address) =>
+      toggleFollow: (trader) =>
         set((state) => ({
-          followed: state.followed.includes(address)
-            ? state.followed.filter((a) => a !== address)
-            : [...state.followed, address],
+          followed: state.followed.some((f) => f.address === trader.address)
+            ? state.followed.filter((f) => f.address !== trader.address)
+            : [...state.followed, trader],
         })),
 
-      isFollowing: (address) => get().followed.includes(address),
+      isFollowing: (address) => get().followed.some((f) => f.address === address),
 
       removePosition: (id) =>
         set((state) => {

@@ -19,6 +19,7 @@ interface LeadersResponse {
   leaders: PolymarketTrader[];
   window: LeaderboardWindow;
   demo: boolean;
+  reason?: string;
   updatedAt: number;
 }
 
@@ -41,17 +42,27 @@ export function CopyTradingPanel() {
               <h2 className="text-sm font-semibold text-text-primary">
                 Most Profitable Traders
               </h2>
-              {data?.demo && (
-                <span className="rounded-full bg-status-warning/15 px-2 py-0.5 text-[10px] font-medium tracking-wide text-status-warning">
-                  DEMO DATA
-                </span>
-              )}
+              {data &&
+                (data.demo ? (
+                  <span className="rounded-full bg-status-warning/15 px-2 py-0.5 text-[10px] font-medium tracking-wide text-status-warning">
+                    DEMO DATA
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-status-good/15 px-2 py-0.5 text-[10px] font-medium tracking-wide text-status-good">
+                    LIVE
+                  </span>
+                ))}
             </div>
             <p className="mt-0.5 max-w-xl text-[11px] leading-snug text-text-muted">
               {data?.demo
                 ? "Simulated Polymarket traders and positions — copying mirrors them into a paper wallet, no real money. Live data flows through the same UI once Polymarket's API is reachable."
                 : "Live Polymarket wallets ranked by profit. Copy their real open positions into your paper wallet — simulated, no real money or wallet needed."}
             </p>
+            {data?.demo && data.reason && (
+              <p className="mt-0.5 max-w-xl text-[10px] leading-snug text-text-muted/70">
+                {data.reason}
+              </p>
+            )}
           </div>
           <div className="flex rounded-md border border-border-hairline bg-surface-0 p-0.5 text-xs">
             {(Object.keys(WINDOW_LABELS) as LeaderboardWindow[]).map((w) => (
@@ -83,6 +94,7 @@ export function CopyTradingPanel() {
               key={trader.address}
               rank={i + 1}
               trader={trader}
+              demo={data.demo}
               expanded={expanded === trader.address}
               onToggle={() =>
                 setExpanded(expanded === trader.address ? null : trader.address)
@@ -100,11 +112,13 @@ export function CopyTradingPanel() {
 function TraderRow({
   rank,
   trader,
+  demo,
   expanded,
   onToggle,
 }: {
   rank: number;
   trader: PolymarketTrader;
+  demo: boolean;
   expanded: boolean;
   onToggle: () => void;
 }) {
@@ -133,7 +147,7 @@ function TraderRow({
         </span>
         <span className="text-text-muted">{expanded ? "▲" : "▼"}</span>
       </button>
-      {expanded && <TraderPositions trader={trader} />}
+      {expanded && <TraderPositions trader={trader} demo={demo} />}
     </li>
   );
 }
@@ -143,14 +157,14 @@ interface PositionsResponse {
   demo: boolean;
 }
 
-function TraderPositions({ trader }: { trader: PolymarketTrader }) {
+function TraderPositions({ trader, demo }: { trader: PolymarketTrader; demo: boolean }) {
   const { data, loading, error } = usePolledFetch<PositionsResponse>(
-    `/api/polymarket/positions?user=${encodeURIComponent(trader.address)}`,
+    `/api/polymarket/positions?user=${encodeURIComponent(trader.address)}${demo ? "&demo=1" : ""}`,
     20_000
   );
   const copyPositions = useCopyTradingStore((s) => s.copyPositions);
   const toggleFollow = useCopyTradingStore((s) => s.toggleFollow);
-  const following = useCopyTradingStore((s) => s.followed.includes(trader.address));
+  const following = useCopyTradingStore((s) => s.followed.some((f) => f.address === trader.address));
   const [flash, setFlash] = useState<string | null>(null);
 
   const positions = data?.positions ?? [];
@@ -192,7 +206,9 @@ function TraderPositions({ trader }: { trader: PolymarketTrader }) {
             Copy positions (${COPY_BUDGET})
           </button>
           <button
-            onClick={() => toggleFollow(trader.address)}
+            onClick={() =>
+              toggleFollow({ address: trader.address, name: trader.name, demo })
+            }
             className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
               following
                 ? "border-status-good/40 bg-status-good/15 text-status-good"

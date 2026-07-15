@@ -40,16 +40,23 @@ export function useCopyMirrorEngine() {
 
       const priceUpdates: Record<string, number> = {};
 
-      for (const address of followed) {
+      for (const trader of followed) {
         try {
-          const res = await fetch(`/api/polymarket/positions?user=${encodeURIComponent(address)}`);
+          const demoParam = trader.demo ? "&demo=1" : "";
+          const res = await fetch(
+            `/api/polymarket/positions?user=${encodeURIComponent(trader.address)}${demoParam}`
+          );
           if (!res.ok) continue;
           const body: PositionsResponse = await res.json();
           if (cancelled) return;
 
-          copyPositions({ address, name: null }, body.positions, PER_FOLLOW_BUDGET);
+          copyPositions(
+            { address: trader.address, name: trader.name },
+            body.positions,
+            PER_FOLLOW_BUDGET
+          );
           for (const p of body.positions) {
-            priceUpdates[`${address}:${p.marketId}:${p.outcome}`] = p.currentPrice;
+            priceUpdates[`${trader.address}:${p.marketId}:${p.outcome}`] = p.currentPrice;
           }
         } catch {
           // skip this trader on error; try again next interval

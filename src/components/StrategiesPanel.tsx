@@ -168,7 +168,8 @@ export function StrategiesPanel() {
 
         <button
           type="submit"
-          className="rounded-md bg-[var(--series-1)] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          className="rounded-lg px-4 py-2 text-sm font-medium text-white shadow-[0_2px_12px_rgba(77,141,255,0.35)] transition-opacity hover:opacity-90"
+          style={{ background: "var(--brand-gradient)" }}
         >
           Create Strategy
         </button>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/inter";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { TabNav } from "@/components/TabNav";
@@ -17,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <div className="flex min-h-screen flex-col bg-surface-0 lg:h-screen">
+        <div className="flex min-h-screen flex-col lg:h-screen">
           <Header />
           <TabNav />
           <div className="flex-1 lg:min-h-0 lg:overflow-hidden">{children}</div>

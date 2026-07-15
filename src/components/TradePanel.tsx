@@ -64,8 +64,8 @@ export function TradePanel({ selectedSymbol }: { selectedSymbol: string }) {
         </button>
       </div>
 
-      <div className="rounded-lg border border-border-hairline bg-surface-1 p-3">
-        <div className="text-[11px] text-text-muted">Portfolio Value (virtual)</div>
+      <div className="rounded-xl border border-border-hairline bg-surface-1 p-3 shadow-[var(--shadow-card)]">
+        <div className="text-[11px] uppercase tracking-wide text-text-muted">Portfolio Value (virtual)</div>
         <div className="text-2xl font-semibold tabular-nums text-text-primary">
           {formatUsd(portfolioValue)}
         </div>
@@ -77,7 +77,7 @@ export function TradePanel({ selectedSymbol }: { selectedSymbol: string }) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-lg border border-border-hairline bg-surface-1 p-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-xl border border-border-hairline bg-surface-1 p-3 shadow-[var(--shadow-card)]">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium text-text-primary">{coinLabel(selectedSymbol)}</span>
           <span className="tabular-nums text-text-secondary">
@@ -129,8 +129,10 @@ export function TradePanel({ selectedSymbol }: { selectedSymbol: string }) {
 
         <button
           type="submit"
-          className={`rounded-md py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 ${
-            side === "buy" ? "bg-status-good" : "bg-status-critical"
+          className={`rounded-lg py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 ${
+            side === "buy"
+              ? "bg-status-good shadow-[0_2px_12px_rgba(47,191,113,0.3)]"
+              : "bg-status-critical shadow-[0_2px_12px_rgba(229,84,75,0.3)]"
           }`}
         >
           {side === "buy" ? "Buy" : "Sell"} {coinLabel(selectedSymbol)}

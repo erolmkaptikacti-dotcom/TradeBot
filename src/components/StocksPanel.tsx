@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { usePolledFetch } from "@/hooks/usePolledFetch";
 import { formatUsd } from "@/lib/format";
 import type { StockQuote } from "@/lib/stocks";
 import { DeltaBadge } from "./DeltaBadge";
 import { PriceSparkline } from "./PriceSparkline";
+import { StockDetailModal } from "./StockDetailModal";
 
 interface WatchlistResponse {
   quotes: StockQuote[];
@@ -18,15 +20,17 @@ export function StocksPanel() {
     "/api/stocks/watchlist",
     POLL_INTERVAL_MS
   );
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
 
   return (
     <div className="flex h-full flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-text-primary">Stocks</h2>
+          <h2 className="text-sm font-semibold text-text-primary">Markets</h2>
           <p className="mt-0.5 text-[11px] text-text-muted">
-            Real quotes via Yahoo Finance, polled every {POLL_INTERVAL_MS / 1000}s.
-            Prices only move while US markets (NYSE/NASDAQ) are open.
+            Stocks, indices, commodities, and crypto via Yahoo Finance, polled every{" "}
+            {POLL_INTERVAL_MS / 1000}s. Click any card for a detailed chart. Stock and
+            index prices only move while US markets are open.
           </p>
         </div>
         {data && <MarketStateBadge quotes={data.quotes} />}
@@ -42,9 +46,10 @@ export function StocksPanel() {
 
       <div className="grid grid-cols-1 gap-3 overflow-y-auto pr-1 sm:grid-cols-2 xl:grid-cols-3">
         {data?.quotes.map((quote) => (
-          <div
+          <button
             key={quote.symbol}
-            className="flex flex-col gap-2 rounded-lg border border-border-hairline bg-surface-1 p-3"
+            onClick={() => setSelectedSymbol(quote.symbol)}
+            className="flex flex-col gap-2 rounded-xl border border-border-hairline bg-surface-1 p-3 text-left transition-all hover:border-[var(--accent)] hover:bg-surface-2"
           >
             <div className="flex items-start justify-between">
               <div>
@@ -64,9 +69,13 @@ export function StocksPanel() {
               <span>H {formatUsd(quote.high)}</span>
               <span>L {formatUsd(quote.low)}</span>
             </div>
-          </div>
+          </button>
         ))}
       </div>
+
+      {selectedSymbol && (
+        <StockDetailModal symbol={selectedSymbol} onClose={() => setSelectedSymbol(null)} />
+      )}
     </div>
   );
 }
@@ -74,7 +83,7 @@ export function StocksPanel() {
 function MarketStateBadge({ quotes }: { quotes: StockQuote[] }) {
   const isOpen = quotes.some((q) => q.marketState === "REGULAR");
   return (
-    <div className="flex items-center gap-1.5 text-[11px] text-text-muted">
+    <div className="flex shrink-0 items-center gap-1.5 text-[11px] text-text-muted">
       <span
         className={`h-1.5 w-1.5 rounded-full ${isOpen ? "bg-status-good" : "bg-status-warning"}`}
         aria-hidden

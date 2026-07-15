@@ -6,7 +6,9 @@ A multi-tab trading dashboard:
   paper-trading ("mimic trades") panel
 - **Top Traders** — real Solana wallets ranked by PnL (via Birdeye), plus
   the full live coin-movers leaderboard (top 24h gainers/losers)
-- **Stocks** — a real live stock watchlist
+- **Stocks** — a real live market watchlist (major stocks plus Nasdaq,
+  S&P 500, gold, oil, Bitcoin, and Ethereum), with a click-through detail
+  view: bigger chart with 1D/5D/1M/6M/1Y ranges, tooltip, and key stats
 - **Strategies** — simple rule-based automation against the paper-trading
   engine (e.g. "buy if price drops 5%")
 
@@ -14,7 +16,9 @@ Built as a starting point for eventually layering on fully automated trading.
 
 ## Stack
 
-- Next.js (App Router) + TypeScript + Tailwind CSS
+- Next.js (App Router) + TypeScript + Tailwind CSS, with a single dark
+  trading-terminal theme (Inter Variable via `@fontsource-variable/inter`,
+  self-hosted so builds never fetch fonts from the network)
 - [Binance.US](https://docs.binance.us/) public REST API (proxied through
   Next.js route handlers) and WebSocket miniTicker stream for real, live,
   keyless crypto data. Base URLs live in `src/lib/binance.ts`

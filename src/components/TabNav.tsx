@@ -14,20 +14,27 @@ export function TabNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex gap-1 overflow-x-auto border-b border-border-hairline bg-surface-1 px-5">
+    <nav className="flex gap-1 overflow-x-auto border-b border-border-hairline bg-surface-1/70 px-4 backdrop-blur">
       {TABS.map((tab) => {
         const isActive = tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
         return (
           <Link
             key={tab.href}
             href={tab.href}
-            className={`whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`relative whitespace-nowrap px-3.5 py-2.5 text-sm font-medium transition-colors ${
               isActive
-                ? "border-[var(--series-1)] text-text-primary"
-                : "border-transparent text-text-muted hover:text-text-secondary"
+                ? "text-text-primary"
+                : "text-text-muted hover:text-text-secondary"
             }`}
           >
             {tab.label}
+            {isActive && (
+              <span
+                className="absolute inset-x-2 -bottom-px h-0.5 rounded-full"
+                style={{ background: "var(--brand-gradient)" }}
+                aria-hidden
+              />
+            )}
           </Link>
         );
       })}

@@ -15,17 +15,17 @@ function CryptoDashboard() {
   );
 
   return (
-    <main className="grid h-full grid-cols-1 gap-px bg-border-hairline lg:grid-cols-[280px_1fr_340px] lg:overflow-hidden">
-      <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
+    <main className="grid h-full grid-cols-1 lg:grid-cols-[280px_1fr_340px] lg:overflow-hidden">
+      <div className="border-b border-border-hairline p-4 lg:min-h-0 lg:overflow-hidden lg:border-b-0 lg:border-r">
         <LeaderboardPanel onSelectSymbol={setSelectedSymbol} />
       </div>
-      <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
+      <div className="border-b border-border-hairline p-4 lg:min-h-0 lg:overflow-hidden lg:border-b-0 lg:border-r">
         <MarketOverviewPanel
           selectedSymbol={selectedSymbol}
           onSelectSymbol={setSelectedSymbol}
         />
       </div>
-      <div className="bg-surface-0 p-4 lg:min-h-0 lg:overflow-hidden">
+      <div className="p-4 lg:min-h-0 lg:overflow-hidden">
         <TradePanel selectedSymbol={selectedSymbol} />
       </div>
     </main>

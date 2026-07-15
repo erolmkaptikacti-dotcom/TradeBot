@@ -70,10 +70,10 @@ export function MarketOverviewPanel({
             <button
               key={symbol}
               onClick={() => onSelectSymbol(symbol)}
-              className={`flex flex-col gap-2 rounded-lg border p-3 text-left transition-colors ${
+              className={`flex flex-col gap-2 rounded-xl border p-3 text-left shadow-[var(--shadow-card)] transition-all ${
                 isSelected
-                  ? "border-[var(--series-1)] bg-surface-2"
-                  : "border-border-hairline bg-surface-1 hover:bg-surface-2"
+                  ? "border-[var(--accent)] bg-surface-2"
+                  : "border-border-hairline bg-surface-1 hover:border-[var(--accent)]/50 hover:bg-surface-2"
               }`}
             >
               <div className="flex items-start justify-between">

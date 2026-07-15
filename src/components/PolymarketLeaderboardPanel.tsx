@@ -13,7 +13,6 @@ import {
   type PolymarketPosition,
   type PolymarketTrader,
 } from "@/lib/polymarket";
-import { DeltaBadge } from "./DeltaBadge";
 
 interface LeadersResponse {
   leaders: PolymarketTrader[];
@@ -238,7 +237,6 @@ function PnlBadge({
   shares: number;
 }) {
   const pnl = (current - entry) * shares;
-  const pnlPercent = entry > 0 ? ((current - entry) / entry) * 100 : 0;
 
   return (
     <div

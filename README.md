@@ -6,11 +6,12 @@ A multi-tab trading dashboard:
   paper-trading ("mimic trades") panel
 - **Top Traders** — real Solana wallets ranked by PnL (via Birdeye), plus
   the full live coin-movers leaderboard (top 24h gainers/losers)
-- **Stocks** — a real live market watchlist (major stocks plus Nasdaq,
-  S&P 500, gold, oil, Bitcoin, and Ethereum), with a click-through detail
-  view: an embedded TradingView Advanced Chart (candlesticks, indicators,
-  drawing tools) plus a stats grid (previous close, day/52-week range,
-  volume) powered by our own Yahoo data
+- **Stocks** — a big always-on TradingView Advanced Chart (candlesticks,
+  indicators, drawing tools) with a symbol picker covering major stocks
+  plus Nasdaq, S&P 500, gold, oil, Bitcoin, and Ethereum; a stats strip
+  (previous close, day/52-week range, volume) and live watchlist grid
+  powered by our own Yahoo proxy. The chart is client-side TradingView,
+  so it keeps working even if the Yahoo quote feed is down.
 - **Strategies** — simple rule-based automation against the paper-trading
   engine (e.g. "buy if price drops 5%")
 

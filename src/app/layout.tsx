@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { TabNav } from "@/components/TabNav";
 import { StrategyEngineRunner } from "@/components/StrategyEngineRunner";
+import { CopyMirrorRunner } from "@/components/CopyMirrorRunner";
 
 export const metadata: Metadata = {
   title: "TradeBot",
@@ -24,6 +25,7 @@ export default function RootLayout({
           <div className="flex-1 lg:min-h-0 lg:overflow-hidden">{children}</div>
         </div>
         <StrategyEngineRunner />
+        <CopyMirrorRunner />
       </body>
     </html>
   );

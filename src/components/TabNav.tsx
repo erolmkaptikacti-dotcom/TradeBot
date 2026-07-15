@@ -7,6 +7,7 @@ const TABS = [
   { href: "/", label: "Crypto" },
   { href: "/top-traders", label: "Top Traders" },
   { href: "/stocks", label: "Stocks" },
+  { href: "/copy-trading", label: "Copy Trading" },
   { href: "/strategies", label: "Strategies" },
 ];
 

@@ -12,6 +12,9 @@ A multi-tab trading dashboard:
   (previous close, day/52-week range, volume) and live watchlist grid
   powered by our own Yahoo proxy. The chart is client-side TradingView,
   so it keeps working even if the Yahoo quote feed is down.
+- **Copy Trading** — Polymarket's most profitable wallets, with one-click
+  copying of their real open prediction-market positions into a paper
+  wallet, plus an auto-copy toggle that keeps mirroring new positions
 - **Strategies** — simple rule-based automation against the paper-trading
   engine (e.g. "buy if price drops 5%")
 
@@ -104,6 +107,34 @@ over time, clearly tagged `demo: true` and labeled "DEMO DATA" in the UI, so
 the tab is never empty and is never mistaken for real data. Add a real key
 and the exact same UI switches to live data automatically, no other changes
 needed.
+
+### Copy Trading (Polymarket)
+
+Polymarket is an on-chain (Polygon) prediction market, so unlike most
+venues its traders' positions are public — which is what makes real
+copy-trading possible. The Copy Trading tab reads Polymarket's profit
+leaderboard (`/api/polymarket/leaders`) and any wallet's open positions
+(`/api/polymarket/positions`), and lets you mirror those positions into a
+**separate paper wallet** (`src/store/copyTradingStore.ts`, virtual $1,000)
+— fully simulated, no real money, no Polymarket account or wallet, and
+none of the US-geoblock/legal exposure that real Polymarket trading carries.
+
+- **Copy positions** snapshots a trader's current book into your paper
+  wallet, sized to a fixed budget and split across their positions.
+- **Auto-copy** follows a trader: a background engine
+  (`src/hooks/useCopyMirrorEngine.ts`, mounted once at the app root) polls
+  their positions and mirrors any new ones, while the tab is open.
+- Copying flows through a single `copyPositions()` seam — the point where a
+  real Polymarket order would later plug in, if you ever chose to go live.
+
+Both Polymarket routes are best-effort against undocumented public
+endpoints (the leaderboard URL is overridable via `POLYMARKET_LEADERBOARD_URL`)
+and fall back to seeded demo data tagged `demo: true` when unreachable, so
+the whole copy → portfolio flow works and is demonstrable regardless.
+
+Note on **Kalshi**: it was considered as another copy source but can't
+serve this feature — its order book is anonymous, with no public
+per-trader positions or profit leaderboard to copy from.
 
 ## Getting started
 

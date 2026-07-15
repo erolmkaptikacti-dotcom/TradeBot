@@ -89,8 +89,14 @@ Unlike the coin-movers leaderboard, this is real individual trader data:
 wallet addresses ranked by realized PnL, with volume and trade count, via
 Birdeye's `/trader/gainers-losers` endpoint (`src/app/api/birdeye/top-traders`).
 It needs a Birdeye API key set as `BIRDEYE_API_KEY` — their trader-analytics
-endpoints require a paid plan, not just the free tier. Without a key, that
-section on the Top Traders tab shows a setup prompt instead of failing.
+endpoints require a paid plan, not just the free tier.
+
+Without a key, the same endpoint returns a simulated leaderboard instead
+(`src/lib/demoTraders.ts`) — plausible wallet addresses and PnL that drift
+over time, clearly tagged `demo: true` and labeled "DEMO DATA" in the UI, so
+the tab is never empty and is never mistaken for real data. Add a real key
+and the exact same UI switches to live data automatically, no other changes
+needed.
 
 ## Getting started
 

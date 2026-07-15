@@ -16,6 +16,7 @@ interface TopTradersResponse {
   traders: BirdeyeTrader[];
   type: TraderType;
   timeFrame: TraderTimeFrame;
+  demo: boolean;
   updatedAt: number;
 }
 
@@ -30,19 +31,26 @@ export function SolanaTopTradersPanel() {
     POLL_INTERVAL_MS
   );
 
-  const missingKey = error === "missing_api_key";
   const traders = data?.traders ?? [];
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border-hairline bg-surface-1 p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="text-sm font-semibold text-text-primary">
-            Solana Top Traders
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-text-primary">
+              Solana Top Traders
+            </h3>
+            {data?.demo && (
+              <span className="rounded-full bg-status-warning/15 px-2 py-0.5 text-[10px] font-medium tracking-wide text-status-warning">
+                DEMO DATA
+              </span>
+            )}
+          </div>
           <p className="mt-0.5 max-w-xl text-[11px] leading-snug text-text-muted">
-            Real wallet addresses ranked by realized PnL, via Birdeye — actual
-            traders, not just top-moving coins.
+            {data?.demo
+              ? "Simulated wallets and PnL — not real traders. Add a Birdeye API key to switch this to live data."
+              : "Real wallet addresses ranked by realized PnL, via Birdeye — actual traders, not just top-moving coins."}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -65,43 +73,22 @@ export function SolanaTopTradersPanel() {
         </div>
       </div>
 
-      {missingKey && (
-        <div className="rounded-md border border-status-warning/30 bg-status-warning/10 p-3 text-xs text-text-secondary">
-          Not configured yet. Get an API key at{" "}
-          <a
-            href="https://birdeye.so"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-text-primary underline"
-          >
-            birdeye.so
-          </a>{" "}
-          (their trader-analytics endpoints require a paid plan) and add it as{" "}
-          <code className="rounded bg-surface-2 px-1 py-0.5">BIRDEYE_API_KEY</code> in
-          your deployment&apos;s environment variables.
-        </div>
-      )}
-
-      {!missingKey && error && (
+      {error && (
         <div className="rounded-md border border-status-critical/30 bg-status-critical/10 p-2 text-xs text-status-critical">
           Couldn&apos;t reach Birdeye: {error}
         </div>
       )}
 
-      {!missingKey && loading && !data && (
+      {loading && !data && (
         <div className="text-xs text-text-muted">Loading live data…</div>
       )}
 
-      {!missingKey && data && (
+      {data && (
         <ol className="flex flex-col gap-1">
-          {traders.map((trader, i) => (
-            <li key={trader.address}>
-              <a
-                href={solscanUrl(trader.address)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-surface-2"
-              >
+          {traders.map((trader, i) => {
+            const rowClasses = "flex items-center gap-3 rounded-md px-2 py-2 text-left";
+            const rowContent = (
+              <>
                 <span className="w-5 shrink-0 text-xs tabular-nums text-text-muted">
                   {i + 1}
                 </span>
@@ -125,9 +112,25 @@ export function SolanaTopTradersPanel() {
                 >
                   {formatSignedUsd(trader.pnl, { compact: true })}
                 </span>
-              </a>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={trader.address}>
+                {data.demo ? (
+                  <div className={rowClasses}>{rowContent}</div>
+                ) : (
+                  <a
+                    href={solscanUrl(trader.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${rowClasses} hover:bg-surface-2`}
+                  >
+                    {rowContent}
+                  </a>
+                )}
+              </li>
+            );
+          })}
           {traders.length === 0 && (
             <li className="px-2 py-2 text-xs text-text-muted">No data</li>
           )}

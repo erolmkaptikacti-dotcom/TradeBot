@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
-import { BIRDEYE_CHAIN, BIRDEYE_REST_BASE, type BirdeyeTrader } from "@/lib/birdeye";
+import {
+  BIRDEYE_CHAIN,
+  BIRDEYE_REST_BASE,
+  type BirdeyeTrader,
+  type TraderTimeFrame,
+  type TraderType,
+} from "@/lib/birdeye";
+import { generateDemoTraders } from "@/lib/demoTraders";
 
 // The exact response field names below are our best understanding of
 // Birdeye's /trader/gainers-losers endpoint; we read every plausible alias
@@ -31,17 +38,22 @@ function num(...candidates: (number | undefined)[]): number {
 }
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const type: TraderType = searchParams.get("type") === "losers" ? "losers" : "gainers";
+  const timeFrameParam = searchParams.get("timeFrame");
+  const timeFrame: TraderTimeFrame =
+    timeFrameParam === "yesterday" || timeFrameParam === "1W" ? timeFrameParam : "today";
+
   const apiKey = process.env.BIRDEYE_API_KEY;
   if (!apiKey) {
-    return NextResponse.json(
-      { error: "missing_api_key", message: "BIRDEYE_API_KEY is not set" },
-      { status: 501 }
-    );
+    return NextResponse.json({
+      traders: generateDemoTraders(type, timeFrame),
+      type,
+      timeFrame,
+      demo: true,
+      updatedAt: Date.now(),
+    });
   }
-
-  const { searchParams } = new URL(request.url);
-  const type = searchParams.get("type") === "losers" ? "losers" : "gainers";
-  const timeFrame = searchParams.get("timeFrame") ?? "today";
 
   const url = new URL(`${BIRDEYE_REST_BASE}/trader/gainers-losers`);
   url.searchParams.set("type", type);
@@ -76,7 +88,7 @@ export async function GET(request: Request) {
       }))
       .filter((t) => t.address.length > 0);
 
-    return NextResponse.json({ traders, type, timeFrame, updatedAt: Date.now() });
+    return NextResponse.json({ traders, type, timeFrame, demo: false, updatedAt: Date.now() });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to reach Birdeye" },

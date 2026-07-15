@@ -5,6 +5,7 @@ import { usePolledFetch } from "@/hooks/usePolledFetch";
 import type { LeaderboardEntry } from "@/lib/binance";
 import { formatUsd } from "@/lib/format";
 import { DeltaBadge } from "./DeltaBadge";
+import { SolanaTopTradersPanel } from "./SolanaTopTradersPanel";
 
 interface LeaderboardResponse {
   gainers: LeaderboardEntry[];
@@ -22,25 +23,35 @@ export function TopTradersPanel() {
     <div className="flex h-full flex-col gap-3 p-4">
       <div>
         <h2 className="text-sm font-semibold text-text-primary">Top Traders</h2>
-        <p className="mt-0.5 max-w-2xl text-[11px] leading-snug text-text-muted">
-          No exchange exposes a real &ldquo;most profitable traders&rdquo; feed
-          without partner API access, so this shows the real, live stand-in:
-          the actual top 24h gainers and losers across all live Binance USDT
-          pairs. Click any coin to open it in the Crypto tab&apos;s trade panel.
-        </p>
       </div>
 
-      {loading && !data && <div className="text-xs text-text-muted">Loading live data…</div>}
+      <div className="flex flex-col gap-4 overflow-y-auto">
+        <SolanaTopTradersPanel />
 
-      {error && (
-        <div className="rounded-md border border-status-critical/30 bg-status-critical/10 p-2 text-xs text-status-critical">
-          Couldn&apos;t reach Binance: {error}
+        <div>
+          <h3 className="text-sm font-semibold text-text-primary">Coin Movers</h3>
+          <p className="mt-0.5 max-w-2xl text-[11px] leading-snug text-text-muted">
+            No exchange exposes a real &ldquo;most profitable traders&rdquo; feed
+            without partner API access, so this is a live stand-in: the actual
+            top 24h gainers and losers across all live Binance USDT pairs.
+            Click any coin to open it in the Crypto tab&apos;s trade panel.
+          </p>
+
+          {loading && !data && (
+            <div className="mt-2 text-xs text-text-muted">Loading live data…</div>
+          )}
+
+          {error && (
+            <div className="mt-2 rounded-md border border-status-critical/30 bg-status-critical/10 p-2 text-xs text-status-critical">
+              Couldn&apos;t reach Binance: {error}
+            </div>
+          )}
+
+          <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <LeaderboardColumn title="Top Gainers" entries={data?.gainers ?? []} />
+            <LeaderboardColumn title="Top Losers" entries={data?.losers ?? []} />
+          </div>
         </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2">
-        <LeaderboardColumn title="Top Gainers" entries={data?.gainers ?? []} />
-        <LeaderboardColumn title="Top Losers" entries={data?.losers ?? []} />
       </div>
     </div>
   );

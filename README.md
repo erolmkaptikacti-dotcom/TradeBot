@@ -4,7 +4,8 @@ A multi-tab trading dashboard:
 
 - **Crypto** — live 24h leaderboard, real-time market overview, and a
   paper-trading ("mimic trades") panel
-- **Top Traders** — the full live leaderboard (top 24h gainers/losers)
+- **Top Traders** — real Solana wallets ranked by PnL (via Birdeye), plus
+  the full live coin-movers leaderboard (top 24h gainers/losers)
 - **Stocks** — a real live stock watchlist
 - **Strategies** — simple rule-based automation against the paper-trading
   engine (e.g. "buy if price drops 5%")
@@ -23,6 +24,9 @@ Built as a starting point for eventually layering on fully automated trading.
   somewhere binance.com isn't geo-blocked, swap those two constants back.
 - Yahoo Finance's public (keyless, unofficial) chart endpoint for real stock
   quotes — see `src/lib/stocks.ts`
+- [Birdeye](https://birdeye.so)'s trader-analytics API for real Solana
+  wallet PnL leaderboards — see `src/lib/birdeye.ts`. Requires a paid API
+  key (`BIRDEYE_API_KEY`); degrades to a setup prompt without one.
 - Zustand (+ `persist`) for the local paper-trading engine and the strategy
   store
 
@@ -79,21 +83,32 @@ option for stock data — every documented provider (Finnhub, Alpha Vantage,
 etc.) requires a free API key at minimum. Stock prices are polled every 15s
 rather than streamed, and only move while US markets are open.
 
+### Solana Top Traders (Birdeye)
+
+Unlike the coin-movers leaderboard, this is real individual trader data:
+wallet addresses ranked by realized PnL, with volume and trade count, via
+Birdeye's `/trader/gainers-losers` endpoint (`src/app/api/birdeye/top-traders`).
+It needs a Birdeye API key set as `BIRDEYE_API_KEY` — their trader-analytics
+endpoints require a paid plan, not just the free tier. Without a key, that
+section on the Top Traders tab shows a setup prompt instead of failing.
+
 ## Getting started
 
 ```bash
 npm install
+cp .env.example .env.local   # optional — only needed for Birdeye top traders
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-No API keys are required — all data is public. If a sandboxed/restricted
-network environment blocks outbound requests to Binance.US or Yahoo
-Finance, the panels degrade gracefully (loading / "couldn't reach ___"
-states) rather than crashing; everything works normally with standard
-internet access (e.g. deployed on Vercel, or run locally on a normal
-machine).
+Most data needs no API keys at all. If a sandboxed/restricted network
+environment blocks outbound requests to Binance.US or Yahoo Finance, the
+panels degrade gracefully (loading / "couldn't reach ___" states) rather
+than crashing; everything works normally with standard internet access
+(e.g. deployed on Vercel, or run locally on a normal machine). When
+deploying to Vercel, add `BIRDEYE_API_KEY` under Project Settings →
+Environment Variables if you want the Solana Top Traders section enabled.
 
 ## Roadmap
 
@@ -102,5 +117,6 @@ machine).
 - Move the strategy engine server-side (e.g. a cron-triggered function) so
   it keeps running without a browser tab open
 - Add more trigger types to strategies (e.g. moving averages, RSI)
-- Real trader-leaderboard data source, if/when one is available
 - Paper trading for stocks, mirroring the crypto trade panel
+- Per-token Birdeye top traders (not just the global gainers/losers feed),
+  and the same kind of real trader data for other chains

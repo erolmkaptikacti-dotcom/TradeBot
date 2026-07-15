@@ -8,7 +8,9 @@ A multi-tab trading dashboard:
   the full live coin-movers leaderboard (top 24h gainers/losers)
 - **Stocks** — a real live market watchlist (major stocks plus Nasdaq,
   S&P 500, gold, oil, Bitcoin, and Ethereum), with a click-through detail
-  view: bigger chart with 1D/5D/1M/6M/1Y ranges, tooltip, and key stats
+  view: an embedded TradingView Advanced Chart (candlesticks, indicators,
+  drawing tools) plus a stats grid (previous close, day/52-week range,
+  volume) powered by our own Yahoo data
 - **Strategies** — simple rule-based automation against the paper-trading
   engine (e.g. "buy if price drops 5%")
 
@@ -122,8 +124,13 @@ Environment Variables if you want the Solana Top Traders section enabled.
 
 ## Roadmap
 
-- Swap `placeOrder()` in `paperTradingStore` for a real exchange order call
-  to go live
+- **Real broker execution.** TradingView provides the charts but is not a
+  broker and has no order API for third-party apps, so real trades need a
+  broker integration. The intended path is [Alpaca](https://alpaca.markets)
+  (free, stocks + crypto, with a paper-trading mode that uses the same API
+  as live) wired in behind the existing `placeOrder()` seam — paper first,
+  live later by swapping the key. Deferred for now; trades stay simulated.
+- Swap `placeOrder()` in `paperTradingStore` for that Alpaca call to go live
 - Move the strategy engine server-side (e.g. a cron-triggered function) so
   it keeps running without a browser tab open
 - Add more trigger types to strategies (e.g. moving averages, RSI)

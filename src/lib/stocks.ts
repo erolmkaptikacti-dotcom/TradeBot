@@ -43,6 +43,29 @@ export const STOCK_LABELS: Record<string, string> = {
   "ETH-USD": "Ethereum",
 };
 
+// TradingView uses its own exchange-prefixed ticker notation, distinct from
+// Yahoo's. Map each watchlist symbol to the equivalent TradingView symbol
+// so the embedded Advanced Chart resolves the right instrument.
+export const TRADINGVIEW_SYMBOLS: Record<string, string> = {
+  AAPL: "NASDAQ:AAPL",
+  MSFT: "NASDAQ:MSFT",
+  GOOGL: "NASDAQ:GOOGL",
+  AMZN: "NASDAQ:AMZN",
+  NVDA: "NASDAQ:NVDA",
+  TSLA: "NASDAQ:TSLA",
+  META: "NASDAQ:META",
+  "^IXIC": "NASDAQ:IXIC",
+  "^GSPC": "SP:SPX",
+  "GC=F": "TVC:GOLD",
+  "CL=F": "TVC:USOIL",
+  "BTC-USD": "CRYPTO:BTCUSD",
+  "ETH-USD": "CRYPTO:ETHUSD",
+};
+
+export function tradingViewSymbol(symbol: string): string {
+  return TRADINGVIEW_SYMBOLS[symbol] ?? symbol;
+}
+
 export interface StockQuote {
   symbol: string;
   label: string;
